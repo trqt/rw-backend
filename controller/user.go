@@ -1,14 +1,17 @@
 package controller
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"readyworker.com/backend/database"
@@ -78,7 +81,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := &model.User{
-		Type:        "worker",
+		Role:        "worker",
 		Cpf:         cpf,
 		Name:        name,
 		Password:    password_hash,
@@ -126,7 +129,45 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(time.Now().Format(time.RFC850), "Successful login by: ", cpf)
 
-	w.Write([]byte("Hello " + user.Email))
+	// JWT Token generation
+	validToken, err := GenerateJWT(user.Cpf, user.Role)
+	if err != nil {
+		http.Error(w, "Token generation error", http.StatusInternalServerError)
+		return
+	}
+
+	var token model.UserToken
+	token.Cpf = user.Cpf
+	token.Role = user.Role
+	token.TokenString = validToken
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(token)
+
+	//w.Write([]byte("Hello " + user.Email))
+}
+
+func GenerateJWT(cpf, role string) (string, error) {
+	secret := os.Getenv("JWT_SECRETKEY")
+	if secret == "" {
+		secret = "dev-readyworker"
+	}
+
+	key := []byte(secret)
+	token := jwt.New(jwt.SigningMethodHS256)
+	claims := token.Claims.(jwt.MapClaims)
+
+	claims["authorized"] = true
+	claims["cpf"] = cpf
+	claims["role"] = role
+	claims["exp"] = time.Now().Add(time.Minute * 45).Unix()
+
+	tokenString, err := token.SignedString(key)
+
+	if err != nil {
+		fmt.Println("JWT Oops..")
+		return "", err
+	}
+	return tokenString, nil
 }
 
 func validateCpf(cpf string) error {
