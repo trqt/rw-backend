@@ -5,18 +5,17 @@ import (
 	"net/http"
 	"time"
 
-	// "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"readyworker.com/backend/controller"
 	"readyworker.com/backend/database"
 )
 
-//var SECRET_KEY = []byte("gosecretkey")
-
 func main() {
 	log.Println("Starting...")
 
-	database.Connect()
+	// Migration
+	db := database.Connect()
+	database.Migrate(db)
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", controller.Home).Methods("GET")
@@ -27,6 +26,10 @@ func main() {
 
 	r.HandleFunc("/signup", controller.ServeSignUp).Methods("GET")
 	r.HandleFunc("/signup", controller.SignUp).Methods("POST")
+
+	r.HandleFunc("/comment", controller.PutComment).Methods("PUT")
+	r.HandleFunc("/comment", controller.GetComment).Methods("GET")
+	r.HandleFunc("/comment", controller.DeleteComment).Methods("DELETE")
 
 	r.Use(RequestLoggerMiddleware(r))
 
