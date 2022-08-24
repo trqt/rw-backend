@@ -1,5 +1,5 @@
 FROM golang:1.18-alpine AS builder
-RUN apk add git
+RUN apk add --no-cache git=2.36.2-r0 && rm -rf /var/cache/apk/*
 WORKDIR /opt
 
 
@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 go build -o app
 
 # Run the generated "main" executable
 
-FROM alpine:latest
+FROM alpine:3.16
 COPY --from=builder /opt/app /
 COPY pages /pages
 CMD [ "/app" ]
