@@ -1,27 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReadyWorker | Cadastro</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReadyWorker | Cadastro</title>
+  <link rel="stylesheet" href="static/csssite.css">
 </head>
-
 <body>
-    <form action="signup" method="post">
-        CPF:
-        <input type="text" name="cpf" id=""><br>
-        Nome:
-        <input type="text" name="name" id=""><br>
-        E-mail:
-        <input type="email" name="email" id=""><br>
-        Senha:
-        <input type="password" name="password" id=""><br>
-        <textarea name="description" id="" cols="30" rows="10"></textarea><br>
+  <nav id="menu-horiz">
+    <ul>
+      <li>
+      <a href="/">Página inicial</a>
+      <a href="login">Login</a>
+      <a href="signup">Cadastre-se</a>
+      </li>
+    </ul>
+  </nav>
+  <form action="signup" method="post">
+    CPF:
+    <input type="text" name="cpf" id=""><br>
+    Nome:
+    <input type="text" name="name" id=""><br>
+    E-mail:
+    <input type="email" name="email" id=""><br>
+    Senha:
+    <input type="password" name="password" id=""><br>
+    <textarea name="description" id="" cols="30" rows="10"></textarea><br>
 
-        <button type="submit">Cadastrar-se</button>
-    </form>
+    <button type="submit">Cadastrar-se</button>
+  </form>
 </body>
-
 </html>

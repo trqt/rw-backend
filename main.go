@@ -19,6 +19,8 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", controller.Home).Methods("GET")
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./pages/static/"))))
+
 	r.HandleFunc("/login", controller.ServeLogin).Methods("GET")
 	r.HandleFunc("/login", controller.Login).Methods("POST")
 	//r.HandleFunc("/list", controller.ListAll).Methods("GET")
@@ -42,9 +44,11 @@ func RequestLoggerMiddleware(r *mux.Router) mux.MiddlewareFunc {
 			start := time.Now()
 			defer func() {
 				log.Printf(
-					"[%s] [%v] %s %s %s",
+					"[%s] [%v] %s %s on %s %s %s",
 					req.Method,
 					time.Since(start),
+					req.RemoteAddr,
+					req.UserAgent(),
 					req.Host,
 					req.URL.Path,
 					req.URL.RawQuery,
