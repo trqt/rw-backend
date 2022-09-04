@@ -183,6 +183,8 @@ func validateCpf(cpf string) error {
 	if len(cpf) != 11 {
 		return errors.New("Invalid CPF")
 	}
+
+	return nil
 }
 
 func validateName(name string) error {

@@ -29,9 +29,14 @@ func main() {
 	r.HandleFunc("/signup", controller.ServeSignUp).Methods("GET")
 	r.HandleFunc("/signup", controller.SignUp).Methods("POST")
 
+	r.HandleFunc("/user/{id}", controller.UserPage).Methods("GET")
+
 	r.HandleFunc("/comment", controller.PutComment).Methods("PUT")
-	r.HandleFunc("/comment", controller.GetComment).Methods("GET")
-	r.HandleFunc("/comment", controller.DeleteComment).Methods("DELETE")
+	r.HandleFunc("/comment/{id}", controller.GetComment).Methods("GET")
+	r.HandleFunc("/comment/{id}", controller.DeleteComment).Methods("DELETE")
+
+	// TODO: Authentication
+	r.HandleFunc("/status/{workid}", controller.GetWorkStatus).Methods("GET")
 
 	r.Use(RequestLoggerMiddleware(r))
 
