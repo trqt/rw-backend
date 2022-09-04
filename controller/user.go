@@ -41,6 +41,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	cpf := r.FormValue("cpf")
 	name := r.FormValue("name")
 	email := r.FormValue("email")
+	password := r.FormValue("password")
 	desc := r.FormValue("description")
 
 	err = validateCpf(cpf)
@@ -54,6 +55,11 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = validateEmail(email)
+	if err != nil {
+		http.Error(w, fmt.Sprint(err), http.StatusBadRequest)
+		return
+	}
+	err = validatePassword(password)
 	if err != nil {
 		http.Error(w, fmt.Sprint(err), http.StatusBadRequest)
 		return
@@ -73,7 +79,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	password_hash, err := bcrypt.GenerateFromPassword([]byte(r.FormValue("password")), bcrypt.DefaultCost)
+	password_hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		http.Error(w, "Encryption error", http.StatusInternalServerError)
 		log.Println(err)
@@ -177,7 +183,6 @@ func validateCpf(cpf string) error {
 	if len(cpf) != 11 {
 		return errors.New("Invalid CPF")
 	}
-	return nil
 }
 
 func validateName(name string) error {
@@ -195,6 +200,18 @@ func validateEmail(email string) error {
 
 	if !strings.Contains(email, "@") || !strings.Contains(email, ".") {
 		return errors.New("Invalid E-mail")
+	}
+	return nil
+}
+
+func validatePassword(pass string) error {
+	// TODO: Sanitise?
+	// TODO: Require numbers and special chars
+	if len(pass) > 50 {
+		return errors.New("Password too long")
+	}
+	if len(pass) < 8 {
+		return errors.New("Password too short")
 	}
 	return nil
 }
