@@ -18,6 +18,9 @@ func main() {
 	database.Migrate(db)
 
 	r := mux.NewRouter()
+
+	r.NotFoundHandler = http.HandlerFunc(notFound)
+
 	r.HandleFunc("/", controller.Home).Methods("GET")
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./pages/static/"))))
 
@@ -63,4 +66,8 @@ func RequestLoggerMiddleware(r *mux.Router) mux.MiddlewareFunc {
 			next.ServeHTTP(w, req)
 		})
 	}
+}
+
+func notFound(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "pages/404.html")
 }
