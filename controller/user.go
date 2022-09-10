@@ -1,10 +1,7 @@
 package controller
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -12,168 +9,134 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"readyworker.com/backend/database"
 	"readyworker.com/backend/model"
 )
 
-type ErrorResponse struct {
-	Err string
-}
-
-type error interface {
-	Error() string
-}
-
 var db = database.Connect()
 
-func SignUp(w http.ResponseWriter, r *http.Request) {
+func SignUp(c echo.Context) error {
+	u := new(model.User)
 
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Error on parsing request", http.StatusInternalServerError)
-		log.Println(err)
-		return
+	if err := c.Bind(u); err != nil {
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Internal server error"}
 	}
 
 	// Validation
-	cpf := r.FormValue("cpf")
-	name := r.FormValue("name")
-	email := r.FormValue("email")
-	password := r.FormValue("password")
-	desc := r.FormValue("description")
-
-	err = validateCpf(cpf)
-	if err != nil {
-		http.Error(w, fmt.Sprint(err), http.StatusBadRequest)
-		return
+	if u.Role == "" || (u.Role != "worker" && u.Role != "hirer") {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid Role"}
 	}
-	err = validateName(name)
-	if err != nil {
-		http.Error(w, fmt.Sprint(err), http.StatusBadRequest)
-		return
+	if err := validateCpf(u.Cpf); err != nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
-	err = validateEmail(email)
-	if err != nil {
-		http.Error(w, fmt.Sprint(err), http.StatusBadRequest)
-		return
+	if err := validateName(u.Name); err != nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
-	err = validatePassword(password)
-	if err != nil {
-		http.Error(w, fmt.Sprint(err), http.StatusBadRequest)
-		return
+	if err := validateEmail(u.Email); err != nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
-	err = validateDesc(desc)
-	if err != nil {
-		http.Error(w, fmt.Sprint(err), http.StatusBadRequest)
-		return
+	if err := validatePassword(u.Password); err != nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
+	if err := validateDesc(u.Description); err != nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
 
 	// Check if the user already exists
 	var trash model.User
-	result := db.Where("cpf = ?", cpf).Find(&trash)
+	result := db.Where("cpf = ?", u.Cpf).Find(&trash)
 
 	if result.RowsAffected > 0 {
-		http.Error(w, "User already registered", http.StatusInternalServerError)
-		return
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "User already registered"}
 	}
 
-	password_hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	password_hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
-		http.Error(w, "Encryption error", http.StatusInternalServerError)
-		log.Println(err)
-		return
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Internal server error"}
 	}
 
-	user := &model.User{
-		Role:        "worker",
-		Cpf:         cpf,
-		Name:        name,
-		Password:    password_hash,
-		Email:       email,
-		Description: desc,
-	}
+	u.Password = string(password_hash)
 
-	db.Create(user)
+	db.Create(u)
 
-	// Redirect to login
-	http.Redirect(w, r, "/login", http.StatusFound) // maybe /login?account_created=1
+	u.Password = ""
+	return c.JSON(http.StatusOK, u)
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Error on parsing request", http.StatusInternalServerError)
-		log.Println(err)
-		return
-	}
-	cpf := r.FormValue("cpf")           // Sanitize?
-	password := r.FormValue("password") // Sanitize?
-	log.Println("User login attempt by: ", cpf)
+func Login(c echo.Context) error {
+	u := new(model.User)
 
-	// Accept CPF, Email or Username
+	if err := c.Bind(u); err != nil {
+		return &echo.HTTPError{Code: http.StatusInternalServerError, Message: "Internal server error"}
+	}
+
+	if u.Email == "" && u.Cpf == "" {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Blank CPF or email"}
+	}
+
+	// Accept CPF or E-mail
 	var user model.User
-	result := db.Where("cpf = ?", cpf).First(&user)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		http.Error(w, "User not Found", http.StatusAccepted)
-		//http.Redirect(w, r, "/login?retry=1", http.StatusPermanentRedirect)
-		return
+
+	if u.Email == "" {
+		result := db.Where("cpf = ?", u.Cpf).First(&user)
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return &echo.HTTPError{Code: http.StatusBadRequest, Message: "User not Found"}
+		}
+	} else if u.Cpf == "" {
+		result := db.Where("email = ?", u.Email).First(&user)
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return &echo.HTTPError{Code: http.StatusBadRequest, Message: "User not Found"}
+		}
 	}
 
-	err = bcrypt.CompareHashAndPassword(user.Password, []byte(password))
-	if err != nil {
-		http.Error(w, "Hash don't match", http.StatusAccepted)
-		//http.Redirect(w, r, "/login?retry=1", http.StatusPermanentRedirect)
-		return
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(u.Password)); err != nil {
+		return &echo.HTTPError{Code: http.StatusUnauthorized, Message: "Wrong CPF/Email or password"}
 	}
-
-	// Check if the user exists or the password is wrong
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		http.Error(w, "Wrong password", http.StatusAccepted)
-	}
-
-	log.Println(time.Now().Format(time.RFC850), "Successful login by: ", cpf)
 
 	// JWT Token generation
-	validToken, err := GenerateJWT(user.Cpf, user.Role)
+
+	token, err := GenerateJWT(user.ID, user.Role)
 	if err != nil {
-		http.Error(w, "Token generation error", http.StatusInternalServerError)
-		return
+		return err
 	}
 
-	var token model.UserToken
-	token.Cpf = user.Cpf
-	token.Role = user.Role
-	token.TokenString = validToken
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(token)
-
-	//w.Write([]byte("Hello " + user.Email))
+	return c.JSON(http.StatusOK, echo.Map{
+		"token": token,
+	})
 }
 
-func GenerateJWT(cpf, role string) (string, error) {
+func GenerateJWT(id uint, role string) (string, error) {
 	secret := os.Getenv("JWT_SECRETKEY")
-	if secret == "" {
-		secret = "dev-readyworker"
-	}
 
 	key := []byte(secret)
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["authorized"] = true
-	claims["cpf"] = cpf
+	claims["id"] = id
 	claims["role"] = role
-	claims["exp"] = time.Now().Add(time.Minute * 45).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	tokenString, err := token.SignedString(key)
 
 	if err != nil {
-		fmt.Println("JWT Oops..")
 		return "", err
 	}
 	return tokenString, nil
+}
+func GetIDFromToken(c echo.Context) uint {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	return uint(claims["id"].(float64))
+}
+
+func GetRoleFromToken(c echo.Context) string {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	return claims["role"].(string)
 }
 
 func validateCpf(cpf string) error {
@@ -191,6 +154,9 @@ func validateName(name string) error {
 	// TODO: Sanitise?
 	if len(name) > 200 {
 		return errors.New("Name too long")
+	}
+	if name == "" || len(name) < 5 {
+		return errors.New("Name too short")
 	}
 	return nil
 }

@@ -1,71 +1,55 @@
 package main
 
 import (
-	"log"
 	"net/http"
-	"time"
+	"os"
 
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"readyworker.com/backend/controller"
 	"readyworker.com/backend/database"
 )
 
 func main() {
-	log.Println("Starting...")
+	e := echo.New()
+
+	// Debug Mode
+	e.Debug = true
+
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey: []byte(os.Getenv("JWT_SECRETKEY")),
+		Skipper: func(c echo.Context) bool {
+			// Skip authentication for signup and login requests
+			if c.Path() == "/login" || c.Path() == "/signup" {
+				return true
+			}
+			return false
+		},
+	}))
 
 	// Migration
 	db := database.Connect()
 	database.Migrate(db)
 
-	r := mux.NewRouter()
+	e.Static("/static", "public")
 
-	r.NotFoundHandler = http.HandlerFunc(notFound)
+	e.POST("/login", controller.Login)
 
-	r.HandleFunc("/", controller.Home).Methods("GET")
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./pages/static/"))))
+	e.POST("/signup", controller.SignUp)
 
-	r.HandleFunc("/login", controller.ServeLogin).Methods("GET")
-	r.HandleFunc("/login", controller.Login).Methods("POST")
-	//r.HandleFunc("/list", controller.ListAll).Methods("GET")
-	r.HandleFunc("/list/{id}", controller.List).Methods("GET")
+	e.GET("/user/:id", controller.UserPage)
 
-	r.HandleFunc("/signup", controller.ServeSignUp).Methods("GET")
-	r.HandleFunc("/signup", controller.SignUp).Methods("POST")
+	e.POST("/comment", controller.CreateComment)
+	e.GET("/comment/:id", controller.GetComment)
+	e.DELETE("/comment/:id", controller.DeleteComment)
 
-	r.HandleFunc("/user/{id}", controller.UserPage).Methods("GET")
+	e.POST("/gig/:id", controller.CreateGig)
+	e.GET("/gig/:id", controller.GetGig)
+	e.DELETE("/gig/:id", controller.DeleteGig)
 
-	r.HandleFunc("/comment", controller.PutComment).Methods("PUT")
-	r.HandleFunc("/comment/{id}", controller.GetComment).Methods("GET")
-	r.HandleFunc("/comment/{id}", controller.DeleteComment).Methods("DELETE")
-
-	// TODO: Authentication
-	r.HandleFunc("/status/{workid}", controller.GetWorkStatus).Methods("GET")
-
-	r.Use(RequestLoggerMiddleware(r))
-
-	log.Fatal(http.ListenAndServe(":8080", r))
-}
-
-func RequestLoggerMiddleware(r *mux.Router) mux.MiddlewareFunc {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			start := time.Now()
-			defer func() {
-				log.Printf(
-					"[%s] [%v] %s %s on %s %s %s",
-					req.Method,
-					time.Since(start),
-					req.RemoteAddr,
-					req.UserAgent(),
-					req.Host,
-					req.URL.Path,
-					req.URL.RawQuery,
-				)
-			}()
-
-			next.ServeHTTP(w, req)
-		})
-	}
+	e.Logger.Fatal(e.Start(":8080"))
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {

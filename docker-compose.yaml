@@ -9,6 +9,7 @@ services:
     environment:
       CGO_ENABLED: 0
       MARIADB_PASSWORD: dev
+      JWT_SECRETKEY: dev-readyworker
   mariadb:
     image: mariadb:10.8
     environment:
@@ -17,7 +18,7 @@ services:
       MYSQL_USER: readyworker
       MYSQL_PASSWORD: dev
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "--silent"]
+      test: "/usr/bin/mysql --user=readyworker --password=dev --execute \"SHOW DATABASES;\""
       interval: 1s
       timeout: 5s
       start_period: 5s
