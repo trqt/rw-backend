@@ -15,5 +15,5 @@ RUN CGO_ENABLED=0 go build -o app
 
 FROM alpine:3.16
 COPY --from=builder /opt/app /
-COPY pages /pages
+COPY public /public
 CMD [ "/app" ]
