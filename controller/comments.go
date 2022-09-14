@@ -21,8 +21,8 @@ func CreateComment(c echo.Context) (err error) {
 	role := GetRoleFromToken(c)
 
 	// Validation
-	if comment.Content == "" || comment.WorkerID == 0 {
-		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid content or id fields"}
+	if comment.Content == "" || comment.WorkerID == 0 || comment.Rating > 10 || comment.Rating < 0 {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Invalid content, id or rating fields"}
 	}
 	if role != "hirer" {
 		return &echo.HTTPError{Code: http.StatusUnauthorized, Message: "Unauthorized comment"}
