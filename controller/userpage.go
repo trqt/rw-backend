@@ -22,9 +22,10 @@ func UserPage(c echo.Context) error {
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return &echo.HTTPError{Code: http.StatusNotFound, Message: "User Not Found"}
 	}
-	// Do not leak CPF, password and email
+	// Do not leak private information
 	user.Cpf = ""
 	user.Email = ""
+	user.Phone = ""
 	user.Password = ""
 
 	return c.JSON(http.StatusOK, user)
