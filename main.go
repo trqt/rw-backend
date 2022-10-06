@@ -18,6 +18,10 @@ func main() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
+	e.Use(middleware.CSRF())
+	e.Use(middleware.Secure())
+	e.Use(middleware.Gzip())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey: []byte(os.Getenv("JWT_SECRETKEY")),
 		Skipper: func(c echo.Context) bool {
@@ -45,9 +49,11 @@ func main() {
 	e.GET("/comment/:id", controller.GetComment)
 	e.DELETE("/comment/:id", controller.DeleteComment)
 
-	e.POST("/gig/:id", controller.CreateGig)
+	e.POST("/gig", controller.CreateGig)
 	e.GET("/gig/:id", controller.GetGig)
 	e.DELETE("/gig/:id", controller.DeleteGig)
+
+	e.GET("/gigs", controller.GetUnapprovedGigs)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

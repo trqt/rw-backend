@@ -23,7 +23,7 @@ func Connect() (db *gorm.DB) {
 }
 
 func Migrate(db *gorm.DB) {
-	db.AutoMigrate(&model.User{}, &model.Comment{})
+	db.AutoMigrate(&model.User{}, &model.Comment{}, &model.Gig{})
 }
 
 func Disconnect(db *gorm.DB) error {
