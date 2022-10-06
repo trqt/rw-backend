@@ -33,14 +33,18 @@ func CreateComment(c echo.Context) (err error) {
 	db := database.Connect()
 	defer database.Disconnect(db)
 
-	var author model.User
-	result := db.Where("ID = ?", comment.AuthorID).First(&author)
+	var user model.User
+	/*result := db.Where("ID = ?", comment.AuthorID).First(&author)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Author does not exists"}
-	}
-	result = db.Where("ID = ?", comment.WorkerID).First(&author)
+	}*/
+	result := db.Where("ID = ?", comment.WorkerID).First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: "Worker does not exists"}
+	}
+
+	if user.Role != "worker" {
+		return &echo.HTTPError{Code: http.StatusForbidden, Message: "worker_id doesn't belongs to an worker"}
 	}
 
 	db.Create(&comment)
