@@ -19,7 +19,6 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
-	e.Use(middleware.CSRF())
 	e.Use(middleware.Secure())
 	e.Use(middleware.Gzip())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
@@ -49,11 +48,15 @@ func main() {
 	e.GET("/comment/:id", controller.GetComment)
 	e.DELETE("/comment/:id", controller.DeleteComment)
 
+	e.GET("/comments/:id", controller.GetComments)
+
 	e.POST("/gig", controller.CreateGig)
 	e.GET("/gig/:id", controller.GetGig)
 	e.DELETE("/gig/:id", controller.DeleteGig)
 
 	e.GET("/gigs", controller.GetUnapprovedGigs)
+
+	e.GET("/category/:name", controller.GetUsersFromCategory)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

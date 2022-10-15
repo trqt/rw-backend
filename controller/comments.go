@@ -90,3 +90,19 @@ func GetComment(c echo.Context) error {
 	return c.JSON(http.StatusOK, comment)
 
 }
+
+func GetComments(c echo.Context) error {
+	userID, _ := strconv.Atoi(c.Param("id"))
+
+	db := database.Connect()
+	defer database.Disconnect(db)
+
+	var comments []model.Comment
+	result := db.Where("worker_id = ?", userID).Find(&comments)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return &echo.HTTPError{Code: http.StatusNotFound, Message: "User doesn't have comments"}
+	}
+
+	return c.JSON(http.StatusOK, comments)
+
+}
