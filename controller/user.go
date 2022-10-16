@@ -44,6 +44,9 @@ func SignUp(c echo.Context) error {
 	if err := validateDesc(u.Description); err != nil {
 		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
 	}
+	if err := validateCategory(u.Category); err != nil {
+		return &echo.HTTPError{Code: http.StatusBadRequest, Message: err.Error()}
+	}
 
 	// Check if the user already exists
 	var trash model.User
@@ -191,4 +194,22 @@ func validateDesc(desc string) error {
 		return errors.New("Description too long")
 	}
 	return nil
+}
+
+func validateCategory(category string) error {
+	categories := []string{"pedreiro", "designer", "programador"}
+	if !contains(categories, strings.ToLower(category)) {
+		return errors.New("Invalid Category")
+	}
+	return nil
+}
+
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
 }
