@@ -197,8 +197,9 @@ func validateDesc(desc string) error {
 }
 
 func validateCategory(category string) error {
-	categories := []string{"pedreiro", "designer", "programador"}
-	if !contains(categories, strings.ToLower(category)) {
+	// TODO: Get from databsase
+
+	if !contains(categories, category) {
 		return errors.New("Invalid Category")
 	}
 	return nil
