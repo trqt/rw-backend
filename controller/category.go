@@ -10,6 +10,8 @@ import (
 	"readyworker.com/backend/model"
 )
 
+var categories = []string{"Pedreiro", "Artista", "Comunista"}
+
 func GetUsersFromCategory(c echo.Context) error {
 
 	category := c.Param("name")
@@ -24,4 +26,10 @@ func GetUsersFromCategory(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, users)
+}
+
+func GetCategories(c echo.Context) error {
+	// TODO: Get from database
+
+	return c.JSON(http.StatusOK, categories)
 }
