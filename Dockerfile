@@ -1,5 +1,5 @@
 FROM golang:1.18-alpine AS builder
-RUN apk add --no-cache git=2.36.2-r0 && rm -rf /var/cache/apk/*
+RUN apk add --no-cache git=2.36.3-r0 && rm -rf /var/cache/apk/*
 WORKDIR /opt
 
 
