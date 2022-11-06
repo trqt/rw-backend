@@ -25,7 +25,7 @@ func main() {
 		SigningKey: []byte(os.Getenv("JWT_SECRETKEY")),
 		Skipper: func(c echo.Context) bool {
 			// Skip authentication for signup and login requests
-			if c.Path() == "/login" || c.Path() == "/signup" {
+			if c.Path() == "/login" || c.Path() == "/signup" || c.Path() == "/categories" {
 				return true
 			}
 			return false
@@ -57,6 +57,7 @@ func main() {
 	e.GET("/gigs", controller.GetUnapprovedGigs)
 
 	e.GET("/category/:name", controller.GetUsersFromCategory)
+	e.GET("/categories", controller.GetCategories)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
