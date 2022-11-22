@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"log"
 	"net/http"
 	"os"
 
@@ -15,6 +17,23 @@ func main() {
 
 	// Debug Mode
 	e.Debug = true
+
+	// Load careers
+
+	f, err := os.Open("careers.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// remember to close the file at the end of the program
+	defer f.Close()
+
+	// read the file line by line using scanner
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		// do something with a line
+		controller.Categories = append(controller.Categories, scanner.Text())
+	}
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -58,6 +77,10 @@ func main() {
 
 	e.GET("/category/:name", controller.GetUsersFromCategory)
 	e.GET("/categories", controller.GetCategories)
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

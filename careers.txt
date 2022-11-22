@@ -1,0 +1,168 @@
+Administrador de Bando de Dados
+Administrador de Sistemas de Redes e Computadores
+Administrador de Web
+Agente Artístico 
+Agente Comunitário de Saúde
+Agente de Carga e Frete
+Agente de Conservação Florestal
+Agente de transporte
+Agentes de limpeza de fossas sépticas
+Agrimensor
+Ajudante de carpinteiro
+Ajudante de eletricista
+Ajudante de pedreiro
+Ajudante de pintor
+Ajudante ofícios de construção, pedreiros ou carpinteiros
+Analista de Segurança da Informação
+Analista de controle de qualidade 
+Analista de crédito
+Analista de gestão
+Analista de marketing
+Analista de orçamento
+Analista de pesquisas
+Anfitrião e recepcionistas de restaurante
+Arquiteto de interior
+Arquivista
+Arquivistas
+Assistente social
+Atendente de Balcão
+Atendente de Estoque
+Atendente de Refeitório
+Atendente de cobrança
+Atendente de compras
+Atendente financeiro
+Auditores
+Avaliador de imóveis 
+Açougueiro
+Babá
+Barbeiro
+Barista
+Bartender
+Bibliotecário
+Bibliotecários
+Biofísico
+Bioquímico
+Biólogo
+Cabelereiro
+Caixa
+Carpinteiro
+Carregador de bagagem
+Conselheiro de Reabilitação
+Consultor
+Contador
+Coordenador
+Cozinheiro Fast Food
+Cozinheiro Particular
+Cozinheiro chefe
+Criador de Animais
+Cuidador de Animais 
+Dedetizador
+Desenhista Mecânico
+Desenvolvedor Web
+Desenvolvedor de Aplicativos Mobile
+Desenvolvedor de Software
+Detetive Pessoal
+Economista
+Eletricista
+Empreiteiro de mão de obra agrícola
+Encanador
+Engenheiro Agrícola
+Engenheiro Ambiental
+Engenheiro Elétrico
+Engenheiro biomédico
+Engenheiro bioquímico
+Engenheiro de Mineração
+Engenheiro de Robótica
+Engenheiro de Saúde e Segurança
+Engenheiro de Transporte
+Engenheiro de hardware de computador
+Engenheiro industrial
+Engenheiro químico
+Especialista em gerenciamento de risco
+Especialista em gerenciamento de segurança
+Especialista em suporte ao usuário
+Faxineiro
+Físico
+Garçom 
+Geneticista
+Gerente de dados clínicos
+Gerentes de instalação de energia solar
+Geógrafo
+Geólogo
+Guarda de Pesca e Caça
+Guia de spa
+Guia turístico
+Historiador
+Inspetor Ambiental
+Instalador de Pisos
+Instalador de Sistema de Alarme e Segurança
+Instalador de elevadores
+Instalador de energia fotovoltaica 
+Instalador de forro
+Jardineiro
+Joalheiro
+Legisladores
+Legista
+Limpador de automóveis
+Madeireiro
+Manicure
+Maquiador
+Matemático
+Mecânico de Motocicletas
+Mecânico de Máquinas Industriais
+Mecânico de aquecedores e ar-condicionado
+Mecânico de automóveis
+Mecânico de lancha
+Mediadores
+Microbiologistas
+Modelador de Tecidos
+Montador de cercas
+Montador – Trabalhador de Produção
+Nutricionista
+Operador de Torre, Petróleo e Gás
+Operador de equipamento agrícolas
+Operador de equipamentos de pavimentação
+Operador de máquinas de mineração
+Padeiros
+Pedreiro
+Pesador/Medidor
+Pescador
+Planejador de eventos
+Porteiro
+Professor 
+Projetista de arquitetura
+Projetista elétrico e eletrônico
+Psicólogo
+Químico
+Recepcionista
+Redatores
+Reparador de Bicicletas
+Reparador de Instrumentos musicais
+Reparador de Relógios
+Reparador de computadores
+Representante de Serviço ao Consumidor
+Representante de Vendas
+Representante de pacientes
+Salva-vidas
+Secretário
+Segurança
+Supervisor 
+Supervisor de cozinha
+Tecnólogo em Logística
+Telemarketing
+Terapeuta
+Tesoureiro
+Trabalhador de construção civil
+Trabalhador rural (agricultura)
+Trabalhador rural (pecuária)
+Treinador de animais
+Tutor
+Técnico Eletromecânico
+Técnico de Bioinformática
+Técnico de Climatização
+Técnico de engenharia automotiva
+Técnico em Ciências Forenses
+Técnico em dados geofísicos
+Vendedor de Porta a Porta
+Veterinário
+Vidraceiro

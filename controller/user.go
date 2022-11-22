@@ -156,7 +156,7 @@ func validateCpf(cpf string) error {
 
 func validateName(name string) error {
 	// TODO: Sanitise?
-	if len(name) > 200 {
+	if len(name) > 50 {
 		return errors.New("Name too long")
 	}
 	if name == "" || len(name) < 5 {
@@ -199,7 +199,7 @@ func validateDesc(desc string) error {
 func validateCategory(category string) error {
 	// TODO: Get from databsase
 
-	if !contains(categories, category) {
+	if !contains(Categories, category) {
 		return errors.New("Invalid Category")
 	}
 	return nil
