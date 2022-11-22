@@ -44,7 +44,7 @@ func main() {
 		SigningKey: []byte(os.Getenv("JWT_SECRETKEY")),
 		Skipper: func(c echo.Context) bool {
 			// Skip authentication for signup and login requests
-			if c.Path() == "/login" || c.Path() == "/signup" || c.Path() == "/categories" {
+			if c.Path() == "/api/login" || c.Path() == "/api/signup" || c.Path() == "/api/categories" {
 				return true
 			}
 			return false
@@ -55,28 +55,26 @@ func main() {
 	db := database.Connect()
 	database.Migrate(db)
 
-	e.Static("/static", "public")
+	e.POST("/api/login", controller.Login)
 
-	e.POST("/login", controller.Login)
+	e.POST("/api/signup", controller.SignUp)
 
-	e.POST("/signup", controller.SignUp)
+	e.GET("/api/user/:id", controller.UserPage)
 
-	e.GET("/user/:id", controller.UserPage)
+	e.POST("/api/comment", controller.CreateComment)
+	e.GET("/api/comment/:id", controller.GetComment)
+	e.DELETE("/api/comment/:id", controller.DeleteComment)
 
-	e.POST("/comment", controller.CreateComment)
-	e.GET("/comment/:id", controller.GetComment)
-	e.DELETE("/comment/:id", controller.DeleteComment)
+	e.GET("/api/comments/:id", controller.GetComments)
 
-	e.GET("/comments/:id", controller.GetComments)
+	e.POST("/api/gig", controller.CreateGig)
+	e.GET("/api/gig/:id", controller.GetGig)
+	e.DELETE("/api/gig/:id", controller.DeleteGig)
 
-	e.POST("/gig", controller.CreateGig)
-	e.GET("/gig/:id", controller.GetGig)
-	e.DELETE("/gig/:id", controller.DeleteGig)
+	e.GET("/api/gigs", controller.GetUnapprovedGigs)
 
-	e.GET("/gigs", controller.GetUnapprovedGigs)
-
-	e.GET("/category/:name", controller.GetUsersFromCategory)
-	e.GET("/categories", controller.GetCategories)
+	e.GET("/api/category/:name", controller.GetUsersFromCategory)
+	e.GET("/api/categories", controller.GetCategories)
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
