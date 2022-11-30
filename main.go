@@ -76,6 +76,8 @@ func main() {
 	e.GET("/api/category/:name", controller.GetUsersFromCategory)
 	e.GET("/api/categories", controller.GetCategories)
 
+	e.GET("/api/rating/:id", controller.GetRating)
+
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}

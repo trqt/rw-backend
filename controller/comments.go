@@ -106,3 +106,27 @@ func GetComments(c echo.Context) error {
 	return c.JSON(http.StatusOK, comments)
 
 }
+
+func GetRating(c echo.Context) error {
+	userID, _ := strconv.Atoi(c.Param("id"))
+
+	db := database.Connect()
+	defer database.Disconnect(db)
+
+	var comments []model.Comment
+	result := db.Where("worker_id = ?", userID).Find(&comments)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return &echo.HTTPError{Code: http.StatusNotFound, Message: "User doesn't have comments"}
+	}
+
+	median_rating := 0
+	for _, comment := range comments {
+		median_rating += int(comment.Rating)
+	}
+	if len(comments) == 0 {
+		return c.JSON(http.StatusBadRequest, "Não há avaliações.")
+	}
+	median_rating = median_rating / len(comments)
+
+	return c.JSON(http.StatusOK, median_rating)
+}
