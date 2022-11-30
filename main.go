@@ -71,7 +71,8 @@ func main() {
 	e.GET("/api/gig/:id", controller.GetGig)
 	e.DELETE("/api/gig/:id", controller.DeleteGig)
 
-	e.GET("/api/gigs", controller.GetUnapprovedGigs)
+	e.GET("/api/gigs", controller.GetPendingGigs)
+	e.POST("/api/approve/:id", controller.ApproveGig)
 
 	e.GET("/api/category/:name", controller.GetUsersFromCategory)
 	e.GET("/api/categories", controller.GetCategories)
