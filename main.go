@@ -16,11 +16,11 @@ func main() {
 	e := echo.New()
 
 	// Debug Mode
-	e.Debug = true
+	//e.Debug = true
 
 	// Load careers
 
-	f, err := os.Open("careers.txt")
+	f, err := os.Open("/etc/readyworker/careers.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,6 +60,7 @@ func main() {
 	e.POST("/api/signup", controller.SignUp)
 
 	e.GET("/api/user/:id", controller.UserPage)
+	e.GET("/api/contact/:id", controller.GetContactInfo)
 
 	e.POST("/api/comment", controller.CreateComment)
 	e.GET("/api/comment/:id", controller.GetComment)
