@@ -132,3 +132,33 @@ func ApproveGig(c echo.Context) (err error) {
 
 	return c.NoContent(http.StatusOK)
 }
+
+func CompleteGig(c echo.Context) (err error) {
+	gigID, _ := strconv.Atoi(c.Param("id"))
+
+	db := database.Connect()
+	defer database.Disconnect(db)
+
+	var gig model.Gig
+	result := db.Where("ID = ?", gigID).First(&gig)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return &echo.HTTPError{Code: http.StatusNotFound, Message: "Gig Not Found"}
+	}
+
+	userID := GetIDFromToken(c)
+	role := GetRoleFromToken(c)
+
+	if role == "hirer" {
+		return &echo.HTTPError{Code: http.StatusForbidden, Message: "If the working class produces everything, then everything belongs to them."}
+	}
+
+	if gig.WorkerID != userID {
+		return &echo.HTTPError{Code: http.StatusForbidden, Message: "This gig doesn't belong to you."}
+	}
+
+	gig.Completed = true
+
+	db.Save(&gig)
+
+	return c.NoContent(http.StatusOK)
+}

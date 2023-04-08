@@ -24,14 +24,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// remember to close the file at the end of the program
 	defer f.Close()
 
-	// read the file line by line using scanner
 	scanner := bufio.NewScanner(f)
-
 	for scanner.Scan() {
-		// do something with a line
+
 		controller.Categories = append(controller.Categories, scanner.Text())
 	}
 
@@ -74,6 +71,7 @@ func main() {
 
 	e.GET("/api/gigs", controller.GetPendingGigs)
 	e.POST("/api/approve/:id", controller.ApproveGig)
+	e.POST("/api/complete/:id", controller.CompleteGig)
 
 	e.GET("/api/category/:name", controller.GetUsersFromCategory)
 	e.GET("/api/categories", controller.GetCategories)
