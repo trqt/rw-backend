@@ -22,7 +22,10 @@ func main() {
 
 	f, err := os.Open("/etc/readyworker/careers.txt")
 	if err != nil {
-		log.Fatal(err)
+		f, err = os.Open("./careers.txt")
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	defer f.Close()
 

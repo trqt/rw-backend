@@ -1,3 +1,0 @@
-# Comments
-
-Frontend will request all commentary with requested person id
